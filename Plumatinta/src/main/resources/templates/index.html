@@ -14,7 +14,7 @@
         <header class="header sticky-top">
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
-                    <a class="navbar-brand ms-3" href="#">Pluma y Tinta</a>
+                    <a class="navbar-brand ms-3" href="/" th:href="@{/}">Pluma y Tinta</a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
@@ -54,8 +54,17 @@
                             </li>
                         </ul>
                         <div class="d-flex">
-                            <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar Sesión</button>
-                            <button class="btn btn-outline-light me-3" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</button>
+                            <div th:if="${#authentication.name != 'anonymousUser'}">
+                                <span class="navbar-text text-white me-3">Bienvenido, <span th:text="${#authentication.name}">Usuario</span></span>
+                                <form th:action="@{/logout}" method="post">
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    <button class="btn btn-outline-light me-3" type="submit">Cerrar Sesión</button>
+                                </form>
+                            </div>
+                            <div th:if="${#authentication.name == 'anonymousUser'}">
+                                <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar Sesión</button>
+                                <button class="btn btn-outline-light me-3" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,7 +79,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="loginForm" method="POST" th:action="@{/auth/login}">
+                        <form id="loginForm" method="POST" th:action="@{/auth/login}" onsubmit="return handleLogin(event)">
                             <div class="mb-3">
                                 <label for="emailIni" class="form-label">Email:</label>
                                 <input type="email" class="form-control" id="emailIni" name="email" required>
@@ -79,6 +88,7 @@
                                 <label for="passwordIni" class="form-label">Contraseña:</label>
                                 <input type="password" class="form-control" id="passwordIni" name="password" required>
                             </div>
+                            <div id="loginError" class="text-danger" style="display: none;">Email o contraseña incorrectos.</div>
                             <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                         </form>
                     </div>
@@ -94,7 +104,7 @@
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="registerForm" method="POST" th:action="@{/auth/register}">
+                        <form id="registerForm" method="POST" th:action="@{/auth/register}" onsubmit="return validatePassword()">
                             <div class="row mb-3">
                                 <div class="col">
                                     <label for="nombre" class="form-label">Nombre:</label>
@@ -135,6 +145,7 @@
                                     <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
                                 </div>
                             </div>
+                            <div id="passwordError" class="text-danger" style="display: none;">La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número.</div>
                             <button type="submit" class="btn btn-primary">Registrarse</button>
                         </form>
                     </div>
@@ -249,6 +260,48 @@
                     bookContainer.insertAdjacentHTML('beforeend', bookCard);
                 });
             }
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error during login:', error);
+                document.getElementById('loginError').style.display = 'block';
+            });
+        }
+
+        function validatePassword() {
+            const password = document.getElementById('passwordReg').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordError = document.getElementById('passwordError');
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+            if (!passwordPattern.test(password)) {
+                passwordError.style.display = 'block';
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                passwordError.innerText = 'Las contraseñas no coinciden.';
+                passwordError.style.display = 'block';
+                return false;
+            }
+
+            passwordError.style.display = 'none';
+            return true;
         }
     </script>
 </body>

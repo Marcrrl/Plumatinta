@@ -1,22 +1,35 @@
 package com.proyecto.plumatinta.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false)
     private String apellidos;
+
+    @Column(nullable = false, length = 60)
     private String contraseña;
+
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
     private String rol;
+
+    @Column(nullable = false, unique = true, length = 9)
     private String dni;
+
+    @Column(nullable = false)
     private String direccion;
+
+    @Column(nullable = false, length = 15)
     private String telefono;
 
     public Long getId() {

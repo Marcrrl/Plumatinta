@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import com.proyecto.plumatinta.repository.LibroRepository;
 import com.proyecto.plumatinta.repository.UsuarioRepository;
 import com.proyecto.plumatinta.model.Autor;
@@ -37,9 +38,9 @@ public class PlumatintaApplication {
             EditorialRepository editorialRepository,
             PedidoRepository pedidoRepository,
             LineaPedidoRepository lineaPedidoRepository,
-            CarritoRepository carritoRepository) {
+            CarritoRepository carritoRepository,
+            BCryptPasswordEncoder passwordEncoder) {
         return (args) -> {
-            // Editoriales
             Editorial editorial1 = new Editorial();
             editorial1.setNombre("SAGA");
             editorialRepository.save(editorial1);
@@ -124,7 +125,7 @@ public class PlumatintaApplication {
             Usuario usuario1 = new Usuario();
             usuario1.setNombre("Marc");
             usuario1.setApellidos("Ricart");
-            usuario1.setContraseña("123");
+            usuario1.setContraseña(passwordEncoder.encode("123"));
             usuario1.setEmail("marc@ricart.com");
             usuario1.setRol("cliente");
             usuario1.setDni("12345678A");
@@ -135,7 +136,7 @@ public class PlumatintaApplication {
             Usuario usuario2 = new Usuario();
             usuario2.setNombre("Sergio");
             usuario2.setApellidos("Arjona");
-            usuario2.setContraseña("sergio");
+            usuario2.setContraseña(passwordEncoder.encode("sergio"));
             usuario2.setEmail("sergio@arjona.com");
             usuario2.setRol("admin");
             usuario2.setDni("23456789B");
@@ -146,7 +147,7 @@ public class PlumatintaApplication {
             Usuario usuario3 = new Usuario();
             usuario3.setNombre("Ruben");
             usuario3.setApellidos("Filadetrás");
-            usuario3.setContraseña("ruben");
+            usuario3.setContraseña(passwordEncoder.encode("ruben"));
             usuario3.setEmail("ruben@filadetras.com");
             usuario3.setRol("cliente");
             usuario3.setDni("23456789C");
@@ -157,7 +158,7 @@ public class PlumatintaApplication {
             Usuario usuario4 = new Usuario();
             usuario4.setNombre("admin");
             usuario4.setApellidos("admin");
-            usuario4.setContraseña("admin");
+            usuario4.setContraseña(passwordEncoder.encode("admin"));
             usuario4.setEmail("admin@admin.com");
             usuario4.setRol("admin");
             usuario4.setDni("23456789D");
@@ -168,7 +169,7 @@ public class PlumatintaApplication {
             Usuario usuario5 = new Usuario();
             usuario5.setNombre("Jorge");
             usuario5.setApellidos("Fabro");
-            usuario5.setContraseña("jorge");
+            usuario5.setContraseña(passwordEncoder.encode("jorge"));
             usuario5.setEmail("jorge@fabro.com");
             usuario5.setRol("cliente");
             usuario5.setDni("23456789E");
