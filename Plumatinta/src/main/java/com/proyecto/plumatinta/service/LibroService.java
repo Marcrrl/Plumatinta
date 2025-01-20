@@ -33,4 +33,8 @@ public class LibroService {
     public List<Libro> findByAutor(Long autorId) {
         return libroRepository.findByAutor_Id(autorId);
     }
+
+    public List<Libro> buscarLibrosPorTitulo(String query) {
+        return libroRepository.findByTitleContainingIgnoreCase(query);
+    }
 }

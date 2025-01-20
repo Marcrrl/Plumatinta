@@ -15,13 +15,14 @@
             <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div class="container-fluid">
                     <a class="navbar-brand ms-3" href="/" th:href="@{/}">Pluma y Tinta</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNav">
                         <ul class="navbar-nav mx-auto">
                             <li class="nav-item">
-                                <a class="nav-link active" aria-current="page" href="#">Inicio</a>
+                                <a class="nav-link active" aria-current="page" href="/" th:href="@{/}">Inicio</a>
                             </li>
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -50,20 +51,26 @@
                                 </ul>
                             </li>
                             <li class="nav-item">
-                                <input class="form-control" type="text" placeholder="Buscar un libro...">
+                                <input class="form-control" type="text" placeholder="Buscar un libro..."
+                                    oninput="searchBooks(this.value)">
+                                <div id="searchResults" class="list-group"
+                                    style="position: absolute; z-index: 100; display: none;"></div>
                             </li>
                         </ul>
                         <div class="d-flex">
                             <div th:if="${#authentication.name != 'anonymousUser'}">
-                                <span class="navbar-text text-white me-3">Bienvenido, <span th:text="${#authentication.name}">Usuario</span></span>
+                                <span class="navbar-text text-white me-3">Bienvenido, <span
+                                        th:text="${#authentication.name}">Usuario</span></span>
                                 <form th:action="@{/logout}" method="post">
-                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+                                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
                                     <button class="btn btn-outline-light me-3" type="submit">Cerrar Sesión</button>
                                 </form>
                             </div>
                             <div th:if="${#authentication.name == 'anonymousUser'}">
-                                <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="modal" data-bs-target="#loginModal">Iniciar Sesión</button>
-                                <button class="btn btn-outline-light me-3" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Registrarse</button>
+                                <button class="btn btn-outline-light me-2" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#loginModal">Iniciar Sesión</button>
+                                <button class="btn btn-outline-light me-3" type="button" data-bs-toggle="modal"
+                                    data-bs-target="#registerModal">Registrarse</button>
                             </div>
                         </div>
                     </div>
@@ -71,15 +78,17 @@
             </nav>
         </header>
 
+        <!-- Modal de inicio de sesión -->
         <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content bg-dark text-white">
                     <div class="modal-header">
                         <h5 class="modal-title" id="loginModalLabel">Iniciar Sesión</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="loginForm" method="POST" th:action="@{/auth/login}" onsubmit="return handleLogin(event)">
+                        <form id="loginForm" method="POST" action="/auth/login" onsubmit="return handleLogin(event)">
                             <div class="mb-3">
                                 <label for="emailIni" class="form-label">Email:</label>
                                 <input type="email" class="form-control" id="emailIni" name="email" required>
@@ -88,7 +97,8 @@
                                 <label for="passwordIni" class="form-label">Contraseña:</label>
                                 <input type="password" class="form-control" id="passwordIni" name="password" required>
                             </div>
-                            <div id="loginError" class="text-danger" style="display: none;">Email o contraseña incorrectos.</div>
+                            <div id="loginError" class="text-danger" style="display: none;">Email o contraseña
+                                incorrectos.</div>
                             <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
                         </form>
                     </div>
@@ -96,56 +106,33 @@
             </div>
         </div>
 
-        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <!-- Modal de registro -->
+        <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content bg-dark text-white">
                     <div class="modal-header">
                         <h5 class="modal-title" id="registerModalLabel">Registrarse</h5>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="registerForm" method="POST" th:action="@{/auth/register}" onsubmit="return validatePassword()">
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <label for="nombre" class="form-label">Nombre:</label>
-                                    <input type="text" class="form-control" id="nombre" name="nombre" required>
-                                </div>
-                                <div class="col">
-                                    <label for="apellidos" class="form-label">Apellidos:</label>
-                                    <input type="text" class="form-control" id="apellidos" name="apellidos" required>
-                                </div>
+                        <form id="registerForm" method="POST" action="/auth/register"
+                            onsubmit="return validatePassword()">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre:</label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <label for="emailReg" class="form-label">Email:</label>
-                                    <input type="email" class="form-control" id="emailReg" name="email" required>
-                                </div>
-                                <div class="col">
-                                    <label for="dni" class="form-label">DNI:</label>
-                                    <input type="text" class="form-control" id="dni" name="dni" required>
-                                </div>
+                            <div class="mb-3">
+                                <label for="emailReg" class="form-label">Email:</label>
+                                <input type="email" class="form-control" id="emailReg" name="email" required>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <label for="direccion" class="form-label">Dirección:</label>
-                                    <input type="text" class="form-control" id="direccion" name="direccion" required>
-                                </div>
-                                <div class="col">
-                                    <label for="telefono" class="form-label">Teléfono:</label>
-                                    <input type="tel" class="form-control" id="telefono" name="telefono" required>
-                                </div>
+                            <div class="mb-3">
+                                <label for="passwordReg" class="form-label">Contraseña:</label>
+                                <input type="password" class="form-control" id="passwordReg" name="password" required>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col">
-                                    <label for="passwordReg" class="form-label">Contraseña:</label>
-                                    <input type="password" class="form-control" id="passwordReg" name="password" required>
-                                </div>
-                                <div class="col">
-                                    <label for="confirmPassword" class="form-label">Confirmar Contraseña:</label>
-                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
-                                </div>
-                            </div>
-                            <div id="passwordError" class="text-danger" style="display: none;">La contraseña debe tener al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número.</div>
+                            <div id="passwordError" class="text-danger" style="display: none;">La contraseña debe tener
+                                al menos 8 caracteres, una letra mayúscula, una letra minúscula y un número.</div>
                             <button type="submit" class="btn btn-primary">Registrarse</button>
                         </form>
                     </div>
@@ -153,13 +140,15 @@
             </div>
         </div>
 
+        <!-- Contenido principal -->
         <div class="row main-content align-items-center text-center">
             <div class="col-12">
                 <div class="row mx-2 mt-3">
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4" th:each="libro : ${libros}">
                         <div class="card h-100">
                             <a href="#" th:onclick="'showBookModal(' + ${libro.id} + '); return false;'">
-                                <img th:src="@{/images/{image}(image=${libro.image})}" class="card-img-top" alt="Imagen del Libro">
+                                <img th:src="@{/images/{image}(image=${libro.image})}" class="card-img-top"
+                                    alt="Imagen del Libro">
                             </a>
                             <div class="card-body">
                                 <h5 class="card-title" th:text="${libro.title}">Título del Libro</h5>
@@ -168,61 +157,133 @@
                             </div>
                         </div>
                     </div>
-                    <div th:if="${#lists.isEmpty(libros)}">No hay libros disponibles.</div>
                 </div>
             </div>
         </div>
 
         <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
+            <div class="modal-dialog modal-lg">
                 <div class="modal-content bg-dark text-white">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="bookModalLabel">Información del Libro</h5>
+                        <h2 class="modal-title" id="bookModalLabel">Título del Libro</h2>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body d-flex">
-                        <div class="me-3">
-                            <img id="bookImage" class="img-fluid" alt="Imagen del Libro">
-                        </div>
-                        <div class="flex-grow-1 ms-3" style="flex-basis: 70%;">
-                            <h3 id="bookTitle"></h3>
-                            <p id="bookAuthor"></p>
-                            <p id="bookGenre"></p>
-                            <p id="bookIsbn"></p>
-                            <p id="bookPages"></p>
-                            <p id="bookStock"></p>
-                            <p id="bookPrice"></p>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img id="bookModalImage" class="img-fluid" alt="Imagen del libro">
+                            </div>
+                            
+                            <div class="col-md-6 d-flex justify-content-center flex-column space-between">
+                                <h3 id="bookModalAuthor">Autor del libro</h3>
+                                <div>
+                                    <p id="bookModalIsbn">ISBN: </p>
+                                    <p id="bookModalNumPages">Número de Páginas: </p>
+                                    <p id="bookModalPrice">Precio del libro</p>
+                                    <p id="bookModalStock">Stock: </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        
+        
 
-        <div class="row footer align-items-center text-center">
-    </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            function showBookModal(id) {
+    fetch(`/libro/${id}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al obtener la información del libro');
+            }
+            return response.json();
+        })
+        .then(book => {
+            document.getElementById('bookModalLabel').textContent = book.title;
+            document.getElementById('bookModalAuthor').textContent = `${book.author}`;
+            document.getElementById('bookModalPrice').textContent = `Precio: ${book.price} €`;
+            document.getElementById('bookModalImage').src = `/images/${book.image}`;
+            document.getElementById('bookModalIsbn').textContent = `${book.isbn}`;
+            document.getElementById('bookModalNumPages').textContent = `Número de Páginas: ${book.numPages}`;
+            document.getElementById('bookModalStock').textContent = `Stock: ${book.stock}`;
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function showBookModal(bookId) {
-            fetch(`/libro/${bookId}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('bookImage').src = data.image ? `/images/${data.image}` : '';
-                    document.getElementById('bookImage').alt = data.title || 'Imagen no disponible';
-                    document.getElementById('bookTitle').innerText = (data.title || 'Título no disponible');
-                    document.getElementById('bookAuthor').innerText = 'Autor: ' + (data.author || 'Autor no disponible');
-                    document.getElementById('bookGenre').innerText = 'Género: ' + (data.genero ? data.genero.genero : 'Género no disponible');
-                    document.getElementById('bookIsbn').innerText = 'ISBN: ' + (data.isbn || 'ISBN no disponible');
-                    document.getElementById('bookPages').innerText = 'Páginas: ' + (data.numPages || 'Páginas no disponibles');
-                    document.getElementById('bookPrice').innerText = 'Precio: ' + (data.price ? data.price + ' €' : 'Precio no disponible');
-                    document.getElementById('bookStock').innerText = 'Stock: ' + (data.stock || 'Stock no disponible');
-                    var bookModal = new bootstrap.Modal(document.getElementById('bookModal'));
-                    bookModal.show();
+            const myModal = new bootstrap.Modal(document.getElementById('bookModal'));
+            myModal.show();
+        })
+        .catch(error => {
+            console.error('Error al obtener la información del libro:', error);
+            alert('No se pudo obtener la información del libro. Inténtalo nuevamente.');
+        });
+}
+            function handleLogin(event) {
+                event.preventDefault();
+                const form = event.target;
+                const formData = new FormData(form);
+                fetch(form.action, {
+                    method: form.method,
+                    body: formData,
                 })
-                .catch(error => console.error('Error fetching book data:', error));
-        }
+                    .then(response => {
+                        if (response.ok) {
+                            window.location.href = '/';
+                        } else {
+                            document.getElementById('loginError').style.display = 'block';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error during login:', error);
+                        document.getElementById('loginError').style.display = 'block';
+                    });
+            }
 
-        function filterBooksByGenre(genreId) {
+            function validatePassword() {
+                const password = document.getElementById('passwordReg').value;
+                const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+
+                if (!passwordPattern.test(password)) {
+                    document.getElementById('passwordError').style.display = 'block';
+                    return false;
+                }
+                return true;
+            }
+
+            function searchBooks(query) {
+                if (query.trim() === "") {
+                    document.getElementById('searchResults').style.display = 'none';
+                    return;
+                }
+
+                fetch(`/libros/buscar?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const resultsContainer = document.getElementById('searchResults');
+                        resultsContainer.innerHTML = '';
+
+                        if (data.length > 0) {
+                            data.forEach(book => {
+                                const resultItem = document.createElement('a');
+                                resultItem.classList.add('list-group-item', 'list-group-item-action');
+                                resultItem.href = "#"; 
+                                resultItem.textContent = book.title;
+                                resultItem.onclick = function () {
+                                    showBookModal(book.id);
+                                };
+                                resultsContainer.appendChild(resultItem);
+                            });
+                            resultsContainer.style.display = 'block';
+                        } else {
+                            resultsContainer.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al obtener los resultados:', error);
+                    });
+            }
+            function filterBooksByGenre(genreId) {
             fetch(`/libros/genero/${genreId}`)
                 .then(response => response.json())
                 .then(data => updateBookList(data))
@@ -261,49 +322,7 @@
                 });
             }
         }
-
-        function handleLogin(event) {
-            event.preventDefault();
-            const form = event.target;
-            const formData = new FormData(form);
-            fetch(form.action, {
-                method: form.method,
-                body: formData,
-            })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '/';
-                } else {
-                    document.getElementById('loginError').style.display = 'block';
-                }
-            })
-            .catch(error => {
-                console.error('Error during login:', error);
-                document.getElementById('loginError').style.display = 'block';
-            });
-        }
-
-        function validatePassword() {
-            const password = document.getElementById('passwordReg').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const passwordError = document.getElementById('passwordError');
-            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-
-            if (!passwordPattern.test(password)) {
-                passwordError.style.display = 'block';
-                return false;
-            }
-
-            if (password !== confirmPassword) {
-                passwordError.innerText = 'Las contraseñas no coinciden.';
-                passwordError.style.display = 'block';
-                return false;
-            }
-
-            passwordError.style.display = 'none';
-            return true;
-        }
-    </script>
+        </script>
 </body>
 
 </html>
